@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal App with Splash Screen</title>
+  <style>
+    /* Base Styles */
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      color: #2c3e50;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #2c3e50, #1a1a1a);
+      color: #f5f7fa;
+    }
+
+    /* Splash Screen */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
+    }
+
+    #splash-screen img {
+      width: 150px;
+      height: 150px;
+      animation: pulse 2s infinite;
+    }
+
+    #splash-screen h1 {
+      margin-top: 1rem;
+      font-size: 1.5rem;
+      color: #2c3e50;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Main App (Hidden Initially) */
+    #main-app {
+      display: none;
+    }
+
+    /* Your existing CSS */
+  </style>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <img src="https://raw.githubusercontent.com/anandvip/innerdialogue-2/refs/heads/main/logo/FLUX-2025-01-03-12_12_55.jpeg" alt="Logo">
+    <h1>Welcome to Inner Dialogue</h1>
+  </div>
+
+  <!-- Main App -->
+  <div id="main-app">
+    <h1>Journal App with Google Sign-In and AI</h1>
+    <button id="google-sign-in-button">Continue with Google</button>
+    <button id="log-out-button" style="display: none;">Log Out</button>
+    <div id="journal-hierarchy"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div id="modal-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB00L-6PsCK5LMAVbUPXgNNF0BywlZKqwk",
+      authDomain: "weekly-journal-9df9c.firebaseapp.com",
+      projectId: "weekly-journal-9df9c",
+      storageBucket: "weekly-journal-9df9c.appspot.com",
+      messagingSenderId: "267644429656",
+      appId: "1:267644429656:web:8a5b8a73960f9adf5af12d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // AI Provider Configuration
+    const API_KEYS = {
+      openai: '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',
+      mistral: 'ic8ExdQksCSXrL4qo0sm9bdkwtKmDUCm',
+      gemini: 'AIzaSyBPO0PQ4PltzLQOSGJOxbqnyt-8xAG7ZpA'
+    };
+
+    // Splash Screen Transition
+    const splashScreen = document.getElementById('splash-screen');
+    const mainApp = document.getElementById('main-app');
+
+    setTimeout(() => {
+      splashScreen.style.opacity = '0';
+      setTimeout(() => {
+        splashScreen.style.display = 'none';
+        mainApp.style.display = 'block';
+      }, 500); // Match the transition duration
+    }, 3000); // Show splash screen for 3 seconds
+
+    // Google Sign-In
+    const googleSignInButton = document.getElementById('google-sign-in-button');
+    const logOutButton = document.getElementById('log-out-button');
+
+    googleSignInButton.addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        console.log('User signed in:', user.uid);
+      } catch (error) {
+        console.error('Google Sign-In error:', error.message);
+      }
+    });
+
+    // Log Out
+    logOutButton.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        console.log('User logged out');
+      } catch (error) {
+        console.error('Logout error:', error.message);
+      }
+    });
+
+    // Auth state listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log('User is logged in:', user.uid);
+        googleSignInButton.style.display = 'none';
+        logOutButton.style.display = 'block';
+        loadUserJournal(user.uid);
+      } else {
+        console.log('User is logged out');
+        googleSignInButton.style.display = 'block';
+        logOutButton.style.display = 'none';
+      }
+    });
+
+    // Your existing CRUD and AI functions
+  </script>
+</body>
+</html>
