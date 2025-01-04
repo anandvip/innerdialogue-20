@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inner Dialogue Journal App</title>
+  <title>Inner Dialogue with All Features</title>
   <style>
+    /* Your provided CSS styles */
     /* Base Styles */
     body {
       font-family: system-ui, -apple-system, sans-serif;
       margin: 0;
-      padding: 0;
+      padding: 1rem;
       background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
       color: #2c3e50;
       transition: background-color 0.3s, color 0.3s;
@@ -20,115 +21,107 @@
       color: #f5f7fa;
     }
 
-    /* Splash Screen */
-    #splash-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 1000;
-      transition: opacity 0.5s ease;
-    }
-
-    #splash-screen img {
-      width: 150px;
-      height: 150px;
-      animation: pulse 2s infinite;
-    }
-
-    #splash-screen h1 {
-      margin-top: 1rem;
+    h1 {
       font-size: 1.5rem;
-      color: #2c3e50;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    /* Main App (Hidden Initially) */
-    #main-app {
-      display: none;
-      padding: 1rem;
-    }
-
-    /* Header */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 1rem;
+      color: inherit;
     }
 
-    header h1 {
-      font-size: 1.5rem;
-      margin: 0;
-    }
-
-    /* User Profile */
-    #user-profile {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    #user-profile img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-
-    #user-profile span {
-      font-size: 1rem;
-    }
-
-    #sign-out-button {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    /* Google Sign-In Button */
-    #google-sign-in-button {
-      background: #4285f4;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    #google-sign-in-button img {
-      width: 20px;
-      height: 20px;
-    }
-
-    /* Journal Entries */
-    #journal-hierarchy {
-      margin-top: 1rem;
-    }
-
-    .entry {
+    /* Theme Switcher */
+    .theme-switcher {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      padding: 0.5rem;
       background: rgba(255, 255, 255, 0.9);
-      padding: 1rem;
-      margin: 0.5rem 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .theme-switcher:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .dark-mode .theme-switcher {
+      background: rgba(33, 37, 41, 0.9);
+      color: white;
+    }
+
+    .dark-mode .theme-switcher:hover {
+      background: rgba(33, 37, 41, 1);
+    }
+
+    /* Hierarchy Styles */
+    .group {
+      margin-left: 1rem;
+      border-left: 2px solid rgba(74, 85, 104, 0.1);
+      padding-left: 1rem;
+    }
+
+    .group-header {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 0.75rem;
+      margin: 0.25rem 0;
+      background: rgba(255, 255, 255, 0.8);
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
+    }
+
+    .dark-mode .group-header {
+      background: rgba(33, 37, 41, 0.8);
+      color: white;
+    }
+
+    .group-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .group-header::before {
+      content: "▶";
+      margin-right: 0.75rem;
+      font-size: 0.9rem;
+      color: inherit;
+      transition: transform 0.2s ease;
+    }
+
+    .group-header.expanded::before {
+      content: "▼";
+    }
+
+    .group-content {
+      display: none;
+      margin-left: 1rem;
+      padding-top: 0.5rem;
+    }
+
+    .group-content.expanded {
+      display: block;
+    }
+
+    /* Entry Styles */
+    .entry {
+      position: relative;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .dark-mode .entry {
+      background: rgba(33, 37, 41, 0.9);
+      color: white;
     }
 
     .entry:hover {
@@ -136,103 +129,156 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 
-    .entry-actions {
-      display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
-    }
-
-    .entry-actions button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 0.8rem;
-      color: inherit;
-      transition: color 0.3s;
-    }
-
-    .entry-actions button:hover {
-      color: #228be6;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal.open {
-      display: flex;
-    }
-
-    .modal-content {
+    /* Rich Text Editor */
+    .rich-text-editor {
+      padding: 0.5rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      min-height: 100px;
       background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      max-width: 600px;
-      width: 90%;
-      max-height: 80vh;
-      overflow-y: auto;
-      position: relative;
+      color: #2c3e50;
     }
 
-    .modal-close {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: none;
+    .dark-mode .rich-text-editor {
+      background: #2c3e50;
+      color: white;
+    }
+
+    .formatting-buttons {
+      margin-bottom: 0.5rem;
+    }
+
+    .formatting-buttons button {
+      padding: 0.25rem 0.5rem;
+      margin-right: 0.25rem;
       border: none;
-      font-size: 1.2rem;
+      border-radius: 4px;
       cursor: pointer;
-      color: inherit;
+      background: #e9ecef;
+      transition: background-color 0.3s;
+    }
+
+    .formatting-buttons button:hover {
+      background: #dee2e6;
+    }
+
+    .dark-mode .formatting-buttons button {
+      background: #495057;
+      color: white;
+    }
+
+    .dark-mode .formatting-buttons button:hover {
+      background: #6c757d;
+    }
+
+    /* Delete Icon */
+    .delete-icon {
+      position: absolute;
+      top: 50%;
+      right: 0.75rem;
+      transform: translateY(-50%);
+      opacity: 0;
+      cursor: pointer;
+      color: #e53e3e;
+      transition: opacity 0.3s ease;
+    }
+
+    .entry:hover .delete-icon {
+      opacity: 1;
+    }
+
+    /* Undo Button */
+    .undo-button {
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.5rem 1rem;
+      background: #228be6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translate(-50%, 100%); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    /* Toast Styles */
+    .toast-container {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      padding: 0.75rem 1.25rem;
+      background: rgba(33, 37, 41, 0.95);
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.3s ease-out;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast:hover {
+      opacity: 0.9;
+    }
+
+    .toast.success {
+      background: rgba(40, 167, 69, 0.95);
+    }
+
+    .toast.error {
+      background: rgba(220, 53, 69, 0.95);
+    }
+
+    .toast.info {
+      background: rgba(23, 162, 184, 0.95);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease;
     }
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div id="splash-screen">
-    <img src="https://raw.githubusercontent.com/anandvip/innerdialogue-2/refs/heads/main/logo/FLUX-2025-01-03-12_12_55.jpeg" alt="Logo">
-    <h1>Welcome to Inner Dialogue</h1>
-  </div>
+  <h1>Inner Dialogue with All Features</h1>
+  <div class="theme-switcher" onclick="toggleTheme()">🌓</div>
+  <div id="journal-hierarchy"></div>
 
-  <!-- Main App -->
-  <div id="main-app">
-    <header>
-      <h1>Inner Dialogue Journal</h1>
-      <div id="user-profile" style="display: none;">
-        <img id="user-profile-image" src="" alt="Profile Image">
-        <span id="user-name"></span>
-        <button id="sign-out-button">Sign Out</button>
-      </div>
-      <button id="google-sign-in-button">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
-        Continue with Google
-      </button>
-    </header>
-    <div id="journal-hierarchy"></div>
+  <!-- Undo Button -->
+  <button class="undo-button hidden" id="undo-button" onclick="undoDelete()">Undo</button>
 
-    <!-- Modal -->
-    <div class="modal" id="modal">
-      <div class="modal-content">
-        <button class="modal-close" onclick="closeModal()">×</button>
-        <div id="modal-text"></div>
-      </div>
-    </div>
-  </div>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
 
   <script type="module">
     // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // Firebase configuration
     const firebaseConfig = {
@@ -256,172 +302,283 @@
       gemini: 'AIzaSyBPO0PQ4PltzLQOSGJOxbqnyt-8xAG7ZpA'
     };
 
-    // Splash Screen Transition
-    const splashScreen = document.getElementById('splash-screen');
-    const mainApp = document.getElementById('main-app');
+    // Theme Switcher
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
 
-    setTimeout(() => {
-      splashScreen.style.opacity = '0';
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    }
+
+    // Toast System
+    function showToast(message, type = "info") {
+      const toastContainer = document.getElementById("toast-container");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+
+      // Auto-dismiss after 3 seconds
       setTimeout(() => {
-        splashScreen.style.display = 'none';
-        mainApp.style.display = 'block';
-      }, 500); // Match the transition duration
-    }, 3000); // Show splash screen for 3 seconds
+        toast.remove();
+      }, 3000);
 
-    // Google Sign-In
-    const googleSignInButton = document.getElementById('google-sign-in-button');
-    const userProfile = document.getElementById('user-profile');
-    const userProfileImage = document.getElementById('user-profile-image');
-    const userName = document.getElementById('user-name');
-    const signOutButton = document.getElementById('sign-out-button');
-
-    googleSignInButton.addEventListener('click', async () => {
-      const provider = new GoogleAuthProvider();
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        console.log('User signed in:', user.uid);
-      } catch (error) {
-        console.error('Google Sign-In error:', error.message);
-      }
-    });
-
-    // Sign Out
-    signOutButton.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        console.log('User signed out');
-      } catch (error) {
-        console.error('Sign-out error:', error.message);
-      }
-    });
-
-    // Auth state listener
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log('User is logged in:', user.uid);
-        googleSignInButton.style.display = 'none';
-        userProfile.style.display = 'flex';
-        userProfileImage.src = user.photoURL;
-        userName.textContent = user.displayName;
-        loadUserJournal(user.uid);
-      } else {
-        console.log('User is logged out');
-        googleSignInButton.style.display = 'flex';
-        userProfile.style.display = 'none';
-      }
-    });
-
-    // Load User Journal
-    async function loadUserJournal(userId) {
-      const entriesRef = collection(db, `users/${userId}/entries`);
-      const snapshot = await getDocs(entriesRef);
-      const journalHierarchy = document.getElementById('journal-hierarchy');
-      journalHierarchy.innerHTML = ''; // Clear existing entries
-      snapshot.forEach((doc) => {
-        const entry = doc.data();
-        const entryElement = createEntryElement(entry);
-        journalHierarchy.appendChild(entryElement);
+      // Manual dismiss on click
+      toast.addEventListener("click", () => {
+        toast.remove();
       });
+    }
+
+    // Undo Functionality
+    let deletedEntry = null;
+    let undoTimeout = null;
+
+    function deleteEntry(entryElement, entry) {
+      deletedEntry = { element: entryElement, data: entry };
+      entryElement.style.opacity = '0';
+      entryElement.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        entryElement.remove();
+      }, 300);
+
+      // Show undo button
+      const undoButton = document.getElementById('undo-button');
+      undoButton.classList.remove('hidden');
+
+      // Hide undo button after 5 seconds
+      undoTimeout = setTimeout(() => {
+        undoButton.classList.add('hidden');
+        deletedEntry = null;
+      }, 5000);
+
+      showToast('Entry deleted.', 'info');
+    }
+
+    function undoDelete() {
+      if (deletedEntry) {
+        const { element, data } = deletedEntry;
+        const content = element.parentElement;
+        content.insertBefore(element, content.firstChild);
+        element.style.opacity = '1';
+        element.style.transform = 'translateX(0)';
+        deletedEntry = null;
+
+        // Hide undo button
+        const undoButton = document.getElementById('undo-button');
+        undoButton.classList.add('hidden');
+        clearTimeout(undoTimeout);
+
+        showToast('Entry restored.', 'success');
+      }
+    }
+
+    // Rich Text Support
+    function setupRichTextEditor(editor) {
+      const buttons = editor.previousElementSibling;
+      buttons.querySelector('.bold').onclick = () => document.execCommand('bold');
+      buttons.querySelector('.italic').onclick = () => document.execCommand('italic');
+      buttons.querySelector('.underline').onclick = () => document.execCommand('underline');
+    }
+
+    // AI Integration
+    class AIPromptGenerator {
+      static async generate(keywords, provider) {
+        const prompt = `Write a thoughtful, first-person journal entry about ${keywords}. Focus on self-growth, inner reflection, and emotional awareness.`;
+        const endpoint = provider === 'gemini' 
+          ? `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEYS[provider]}`
+          : provider === 'openai'
+          ? 'https://api.openai.com/v1/chat/completions'
+          : 'https://api.mistral.ai/v1/chat/completions';
+
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${API_KEYS[provider]}`,
+        };
+
+        const requestBody = {
+          model: provider === 'openai' ? 'gpt-3.5-turbo' : 'mistral-tiny',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 150,
+          temperature: 0.7,
+        };
+
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(requestBody),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to generate AI prompt.');
+          }
+
+          const data = await response.json();
+          return data.choices[0].message.content;
+        } catch (error) {
+          console.error('Error generating AI prompt:', error);
+          throw new Error('Failed to generate prompt.');
+        }
+      }
+    }
+
+    // Render the Hierarchy
+    const journalHierarchy = document.getElementById('journal-hierarchy');
+
+    function renderGroup(group, level) {
+      const groupElement = document.createElement('div');
+      groupElement.className = 'group fade-in';
+
+      const header = document.createElement('div');
+      header.className = 'group-header';
+      header.textContent = level === 'year' ? `Year ${group.year}` :
+                          level === 'month' ? `${new Date(group.year, group.month - 1).toLocaleString('default', { month: 'long' })}` :
+                          level === 'week' ? `Week ${group.week}` : '';
+      groupElement.appendChild(header);
+
+      const content = document.createElement('div');
+      content.className = 'group-content';
+      groupElement.appendChild(content);
+
+      if (level === 'year') {
+        group.months.forEach(month => {
+          content.appendChild(renderGroup(month, 'month'));
+        });
+      } else if (level === 'month') {
+        group.weeks.forEach(week => {
+          content.appendChild(renderGroup(week, 'week'));
+        });
+      } else if (level === 'week') {
+        // Add AI Prompt Section for each week
+        const aiPromptSection = document.createElement('div');
+        aiPromptSection.className = 'ai-prompt-section';
+        aiPromptSection.innerHTML = `
+          <input type="text" placeholder="Enter keywords (e.g., growth, fear, gratitude)" class="ai-keywords" />
+          <button onclick="generateAIPrompt(this, '${group.year}', '${group.month}', '${group.week}')">✨ Generate Journal Entry</button>
+        `;
+        content.appendChild(aiPromptSection);
+
+        // Add "New Entry" button for each week
+        const newEntryButton = document.createElement('button');
+        newEntryButton.className = 'new-entry-button';
+        newEntryButton.textContent = '➕ New Entry';
+        newEntryButton.onclick = () => createNewEntry(content, group);
+        content.appendChild(newEntryButton);
+
+        // Render existing entries
+        group.entries.forEach(entry => {
+          const entryElement = createEntryElement(entry);
+          content.appendChild(entryElement);
+        });
+      }
+
+      // Toggle Expand/Collapse
+      header.addEventListener('click', () => {
+        header.classList.toggle('expanded');
+        content.classList.toggle('expanded');
+      });
+
+      return groupElement;
+    }
+
+    // Generate AI-Powered Journal Entry
+    async function generateAIPrompt(button, year, month, week) {
+      const keywords = button.previousElementSibling.value.trim();
+      if (!keywords) {
+        showToast('Please enter some keywords.', 'error');
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = 'Generating...';
+
+      try {
+        const provider = 'openai'; // Default provider
+        const generatedText = await AIPromptGenerator.generate(keywords, provider);
+
+        // Add the generated entry to the selected week
+        const newEntry = {
+          id: `ai-${Date.now()}`,
+          text: generatedText,
+        };
+
+        const weekGroup = entries
+          .find(y => y.year == year)
+          .months.find(m => m.month == month)
+          .weeks.find(w => w.week == week);
+
+        weekGroup.entries.push(newEntry);
+
+        const entryElement = createEntryElement(newEntry);
+        const content = button.closest('.group-content');
+        content.insertBefore(entryElement, content.firstChild);
+
+        showToast('Journal entry generated successfully!', 'success');
+      } catch (error) {
+        console.error('Error generating AI prompt:', error);
+        showToast('Failed to generate journal entry. Please try again.', 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = '✨ Generate Journal Entry';
+      }
+    }
+
+    // Create New Entry
+    function createNewEntry(content, group) {
+      const newEntry = {
+        id: `new-${Date.now()}`,
+        text: '',
+      };
+
+      const entryElement = createEntryElement(newEntry);
+      content.insertBefore(entryElement, content.firstChild);
+
+      // Focus on the new entry's rich text editor
+      const editor = entryElement.querySelector('.rich-text-editor');
+      editor.focus();
     }
 
     // Create Entry Element
     function createEntryElement(entry) {
       const entryElement = document.createElement('div');
-      entryElement.className = 'entry';
-      entryElement.innerHTML = `
-        <div class="entry-text">${entry.text}</div>
-        <div class="entry-actions">
-          <button onclick="editEntry('${entry.id}')">✏️ Edit</button>
-          <button onclick="deleteEntry('${entry.id}')">🗑️ Delete</button>
-        </div>
+      entryElement.className = 'entry fade-in';
+
+      // Rich Text Editor
+      const formattingButtons = document.createElement('div');
+      formattingButtons.className = 'formatting-buttons';
+      formattingButtons.innerHTML = `
+        <button class="bold">B</button>
+        <button class="italic">I</button>
+        <button class="underline">U</button>
       `;
+      entryElement.appendChild(formattingButtons);
+
+      const editor = document.createElement('div');
+      editor.className = 'rich-text-editor';
+      editor.contentEditable = true;
+      editor.textContent = entry.text;
+      entryElement.appendChild(editor);
+
+      setupRichTextEditor(editor);
+
+      // Delete Icon
+      const deleteIcon = document.createElement('span');
+      deleteIcon.className = 'delete-icon';
+      deleteIcon.textContent = '🗑️';
+      deleteIcon.onclick = () => deleteEntry(entryElement, entry);
+      entryElement.appendChild(deleteIcon);
+
       return entryElement;
     }
 
-    // Define editEntry function
-    window.editEntry = async function (entryId) {
-      const user = auth.currentUser;
-      if (user) {
-        const entryRef = doc(db, `users/${user.uid}/entries/${entryId}`);
-        const entry = await getDoc(entryRef);
-        const newText = prompt('Edit your entry:', entry.data().text);
-        if (newText) {
-          await setDoc(entryRef, { text: newText }, { merge: true });
-          loadUserJournal(user.uid);
-        }
-      }
-    };
-
-    // Define deleteEntry function
-    window.deleteEntry = async function (entryId) {
-      const user = auth.currentUser;
-      if (user) {
-        const entryRef = doc(db, `users/${user.uid}/entries/${entryId}`);
-        await deleteDoc(entryRef);
-        console.log('Entry deleted:', entryId);
-        loadUserJournal(user.uid);
-      }
-    };
-
-    // Generate Journal Entry with AI
-    async function generateJournalEntry(prompt, provider = 'openai') {
-      const apiKey = API_KEYS[provider];
-      let url, body;
-
-      if (provider === 'openai') {
-        url = 'https://api.openai.com/v1/completions';
-        body = JSON.stringify({
-          model: 'text-davinci-003',
-          prompt: prompt,
-          max_tokens: 150,
-        });
-      } else if (provider === 'mistral') {
-        url = 'https://api.mistral.ai/v1/completions';
-        body = JSON.stringify({
-          prompt: prompt,
-          max_tokens: 150,
-        });
-      } else if (provider === 'gemini') {
-        url = 'https://api.gemini.ai/v1/completions';
-        body = JSON.stringify({
-          prompt: prompt,
-          max_tokens: 150,
-        });
-      }
-
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-          },
-          body: body,
-        });
-        const data = await response.json();
-        return data.choices[0].text.trim();
-      } catch (error) {
-        console.error('AI error:', error.message);
-        return null;
-      }
-    }
-
-    // Save Entry to Firestore
-    async function saveEntry(userId, entry) {
-      try {
-        const entryRef = doc(collection(db, `users/${userId}/entries`), entry.id);
-        await setDoc(entryRef, entry);
-        console.log('Entry saved:', entry.id);
-      } catch (error) {
-        console.error('Save error:', error.message);
-      }
-    }
-
-    // Close Modal
-    function closeModal() {
-      document.getElementById('modal').classList.remove('open');
-    }
+    // Render the Entire Hierarchy
+    entries.forEach(year => {
+      journalHierarchy.appendChild(renderGroup(year, 'year'));
+    });
   </script>
 </body>
 </html>
