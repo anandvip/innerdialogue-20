@@ -339,6 +339,31 @@
       return entryElement;
     }
 
+    // Define editEntry function
+    window.editEntry = async function (entryId) {
+      const user = auth.currentUser;
+      if (user) {
+        const entryRef = doc(db, `users/${user.uid}/entries/${entryId}`);
+        const entry = await getDoc(entryRef);
+        const newText = prompt('Edit your entry:', entry.data().text);
+        if (newText) {
+          await setDoc(entryRef, { text: newText }, { merge: true });
+          loadUserJournal(user.uid);
+        }
+      }
+    };
+
+    // Define deleteEntry function
+    window.deleteEntry = async function (entryId) {
+      const user = auth.currentUser;
+      if (user) {
+        const entryRef = doc(db, `users/${user.uid}/entries/${entryId}`);
+        await deleteDoc(entryRef);
+        console.log('Entry deleted:', entryId);
+        loadUserJournal(user.uid);
+      }
+    };
+
     // Generate Journal Entry with AI
     async function generateJournalEntry(prompt, provider = 'openai') {
       const apiKey = API_KEYS[provider];
@@ -390,35 +415,6 @@
         console.log('Entry saved:', entry.id);
       } catch (error) {
         console.error('Save error:', error.message);
-      }
-    }
-
-    // Delete Entry from Firestore
-    async function deleteEntry(entryId) {
-      try {
-        const user = auth.currentUser;
-        if (user) {
-          const entryRef = doc(db, `users/${user.uid}/entries/${entryId}`);
-          await deleteDoc(entryRef);
-          console.log('Entry deleted:', entryId);
-          loadUserJournal(user.uid);
-        }
-      } catch (error) {
-        console.error('Delete error:', error.message);
-      }
-    }
-
-    // Edit Entry
-    async function editEntry(entryId) {
-      const user = auth.currentUser;
-      if (user) {
-        const entryRef = doc(db, `users/${user.uid}/entries/${entryId}`);
-        const entry = await getDoc(entryRef);
-        const newText = prompt('Edit your entry:', entry.data().text);
-        if (newText) {
-          await setDoc(entryRef, { text: newText }, { merge: true });
-          loadUserJournal(user.uid);
-        }
       }
     }
 
